@@ -15,15 +15,15 @@ public class IFollower {
 		sensLeft.setFloodlight(true);
 		sensRight.setFloodlight(true);
 
-		double Tv = 0.05;//1.8;
+		double Tv = 0.003;
 		double Tn = 1.5;
-		double Kp = 0.18;
+		double Kp = 2.0;
 		double ei = 0;
 		double el = 0;
 		double diff = calibrate(sensLeft, sensRight);
 		double tt = 0;
-		double fspeed = 300;
-		double t = 0.05;
+		double fspeed = 600;
+		double t = 0.02;
 		
 		while (true) {
 			int left = sensLeft.getNormalizedLightValue();
@@ -35,11 +35,49 @@ public class IFollower {
 				e = 0;
 			}
 			
+			if(Button.RIGHT.isDown()) {
+				Tv += 0.001;
+				
+				try {
+					Thread.sleep((long) (500));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(Button.LEFT.isDown()) {
+				Tv -= 0.001;
+				
+				try {
+					Thread.sleep((long) (500));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(Button.ENTER.isDown()) {
+				Kp += 0.01;
+				
+				try {
+					Thread.sleep((long) (500));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+			if(Button.ESCAPE.isDown()) {
+				Kp -= 0.01;
+				
+				try {
+					Thread.sleep((long) (500));
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+			
 			ei += e;
-
+			
+			LCD.clear();
 			tt-=System.currentTimeMillis()/1000;
-			double w = Kp * (e + t/Tn * ei + Tv/t * (e - el));
-			LCD.drawString("l:" + left + "  diff="+diff+"\nr:" + right + "   tt="+tt+"\ne:" + e + "\nw:" + w, 0, 0);
+			double w = Kp * (e + Tv/t * (e - el)); // Kp * (e + t/Tn * ei + Tv/t * (e - el))
+			LCD.drawString("l:" + left + "  diff="+diff+"\nr:" + right + "   tt="+tt+"\ne:" + e + "\nw:" + w + "\nTv:" + Tv + "\nKp:" + Kp, 0, 0);
 			
 			tt= System.currentTimeMillis()/1000;
 			
